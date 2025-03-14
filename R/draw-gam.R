@@ -530,3 +530,5 @@ suppress_matches_multiple_warning <- function(expr) {
   }
   withCallingHandlers(expr, warning = handler_matches_multiple)
 }
+
+# essai 
