@@ -354,9 +354,7 @@
     ## @param level numeric; the confidence level
     ## @param data dataframe; values to compute confidence interval at
     sim_interval_multi <- function(smooths, level, data) {
-      start <- smooth[["first.para"]]
-      end <- smooth[["last.para"]]
-      para.seq <- unlist(lapply(smooths, function(smooth) start:end))
+      para.seq <- unlist(lapply(smooths, function(smooth) smooth[["first.para"]]:smooth[["last.para"]]))
       Cg <- do.call(cbind, lapply(smooths, PredictMat, data = data)) 
       simDev <- Cg %*% t(buDiff[, para.seq])
       absDev <- abs(sweep(simDev, 1L, data[[".se"]], FUN = "/"))
@@ -387,8 +385,8 @@
         selected_smooths <- lapply(uS, function(s) get_smooth(object, s)) # get the specific smooths
         crit <- sim_interval_multi(selected_smooths, level = level, data = bind_rows(out))
       } else { # is a by variable smooth
-        smooth <- old_get_smooth(object, uS[i])
-        crit <- sim_interval(smooth, level = level, data = out[[i]])
+        selected_smooths <- lapply(uS, function(s) old_get_smooth(object, s))
+        crit <- sim_interval_multi(selected_smooth, level = level, data = bind_rows(out))
       }
       out[[i]][[".crit"]] <- crit # add on the critical value
     }
