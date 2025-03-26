@@ -386,7 +386,7 @@
         crit <- sim_interval_multi(selected_smooths, level = level, data = bind_rows(out))
       } else { # is a by variable smooth
         selected_smooths <- lapply(uS, function(s) old_get_smooth(object, s))
-        crit <- sim_interval_multi(selected_smooth, level = level, data = bind_rows(out))
+        crit <- sim_interval_multi(selected_smooths, level = level, data = bind_rows(out))
       }
       out[[i]][[".crit"]] <- crit # add on the critical value
     }
