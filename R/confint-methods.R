@@ -384,8 +384,8 @@
       # else branch as smooth_estimates knows how to handle very specific
       # smooth names FIXME
       if (is.null(by_levs)) { # not by variable smooth
-        smooth <- get_smooth(object, parm) # get the specific smooth
-        crit <- sim_interval(smooth, level = level, data = out[[i]])
+        selected_smooths <- lapply(uS, function(s) get_smooth(object, s)) # get the specific smooths
+        crit <- sim_interval_multi(selected_smooths, level = level, data = bind_rows(out))
       } else { # is a by variable smooth
         smooth <- old_get_smooth(object, uS[i])
         crit <- sim_interval(smooth, level = level, data = out[[i]])
