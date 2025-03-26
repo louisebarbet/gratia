@@ -99,28 +99,11 @@
     "twlss" = post_link_funs(power = twlss_theta_2_power, scale = exp),
     post_link_funs()
   )
-  
-  # need library(mvtnorm)
   # compute fitted values
   fit <- fit_vals_fun(object,
     data = data, ci_level = ci_level,
     scale = scale, extra_fns = extra_fns, ...
   )
-  # add simultaneous intervals if asked
-  if (simultaneous) {
-    V <- vcov(object) # Variance covariance matrix of coefficients
-    coefs <- coef(object)
-    
-    # simulation generation
-    sim_vals <- rmvnorm(n_sim, mean = coefs, sigma = V)
-    fit_mat <- predict(object, newdata = data, type = "lpmatrix") %*% t(sim_vals)
-    
-    crit_val <- quantile(apply(fit_mat, 2, max), probs = ci_level)
-    
-    # intervals
-    fit$sim_lower <- fit$fit - crit_val * fit$se
-    fit$sim_upper <- fit$fit + crit_val * fit$se
-  }
   fit
 }
 
