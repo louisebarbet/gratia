@@ -353,15 +353,13 @@
     ## @param smooth list; the individual smooth to work on
     ## @param level numeric; the confidence level
     ## @param data dataframe; values to compute confidence interval at
-    sim_interval <- function(smooth, level, data) {
-      start <- smooth[["first.para"]]
-      end <- smooth[["last.para"]]
-      para.seq <- start:end
-      Cg <- PredictMat(smooth, data)
+    sim_interval_multi <- function(smooths, level, data) {
+      para.seq <- unlist(lapply(smooths, function(smooth) smooth[["first.para"]]:smooth[["last.para"]]))
+      Cg <- do.call(cbind, lapply(smooths, PredictMat, data = data)) 
       simDev <- Cg %*% t(buDiff[, para.seq])
       absDev <- abs(sweep(simDev, 1L, data[[".se"]], FUN = "/"))
-      masd <- apply(absDev, 2L, max)
-      unname(quantile(masd, probs = level, type = 8))
+      masd <- apply(absDev, 2L, max) 
+      unname(quantile(masd, probs = level, type = 8)) 
     }
     ## need VCOV for simultaneous intervals
     V <- get_vcov(object, unconditional = unconditional)
@@ -384,11 +382,11 @@
       # else branch as smooth_estimates knows how to handle very specific
       # smooth names FIXME
       if (is.null(by_levs)) { # not by variable smooth
-        smooth <- get_smooth(object, parm) # get the specific smooth
-        crit <- sim_interval(smooth, level = level, data = out[[i]])
+        selected_smooths <- lapply(uS, function(s) get_smooth(object, s)) # get the specific smooths
+        crit <- sim_interval_multi(selected_smooths, level = level, data = bind_rows(out))
       } else { # is a by variable smooth
-        smooth <- old_get_smooth(object, uS[i])
-        crit <- sim_interval(smooth, level = level, data = out[[i]])
+        selected_smooths <- lapply(uS, function(s) old_get_smooth(object, s))
+        crit <- sim_interval_multi(selected_smooths, level = level, data = bind_rows(out))
       }
       out[[i]][[".crit"]] <- crit # add on the critical value
     }
